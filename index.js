@@ -30,7 +30,7 @@ module.exports = class ActivityBackgrounds extends Plugin {
                     let image = "https://i.scdn.co/image/" + activities[0].assets.large_image.split(":")[1]
                     let item = document.getElementsByClassName('topSectionSpotify-1lI0-P', 'headerSpotify-zpWxgT', 'userPopout-3XzG_A')
                     if (!item.length) {
-                        item = getPopout
+                        item = getPopout()
                     }
                     if (!item.length) {
                         console.log("nothing found :/")
@@ -50,7 +50,6 @@ module.exports = class ActivityBackgrounds extends Plugin {
 //                    let image = document.getElementsByClassName('gameIcon-_0rmMm')[0].style.backgroundImage.slice(4).replace(")","");
 //                    let item = document.getElementsByClassName('topSectionPlaying-1J5E4n', 'headerPlaying-j0WQBV', 'userPopout-3XzG_A')[0]
 //
-//                    console.log(item.style);
 //                    if (item.style) {
 //                        item.style.backgroundImage = `url(${image})`
 //                        item.zIndex = "1"
