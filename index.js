@@ -52,6 +52,7 @@ module.exports = class SpotifyBackgrounds extends Plugin {
                 background.backgroundImage = `url(${image})`
                 background.backgroundSize = "cover"
                 background.filter = "none"
+                background.boxShadow = "inset 0 0 0 1000px rgb(0 0 0 / 60%)"
                 
             }
 
