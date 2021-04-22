@@ -1,0 +1,19 @@
+// credit: Doggybootsy(pinging is okay)#1333
+.powercord-spotify:hover,.container-3baos1:hover {
+  backdrop-filter: unset !important;
+  position: center;
+  &::after{
+      backdrop-filter: brightness(70%);
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+  }
+}
+.panels-j1Uci_ {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}

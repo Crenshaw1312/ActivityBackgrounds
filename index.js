@@ -26,7 +26,7 @@ module.exports = class SpotifyBackgrounds extends Plugin {
 
         if (_this.settings.get("pc-spotify", true)) {
             FluxDispatcher.subscribe("SPOTIFY_CURRENT_TRACK_UPDATED", changeBackground)
-            _this.loadStylesheet('style.css')
+            _this.loadStylesheet('style.scss')
         }
         function changeBackground (song) {
             document.querySelector(".panels-j1Uci_").style.backgroundImage = `url(${song.track.cover})`
