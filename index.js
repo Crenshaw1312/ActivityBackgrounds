@@ -1,4 +1,5 @@
 const { Plugin } = require('powercord/entities')
+const { findInReactTree } = require('powercord/util')
 const { getModule, getModuleByDisplayName } = require('powercord/webpack')
 const { inject, uninject } = require('powercord/injector')
 
@@ -10,57 +11,48 @@ const filterActivities = (a, i) => {
     return a.type !== 4
 }
 
-const getPopout = () => {
-    window.getComputedStyle(document.querySelector('.userPopout-3XzG_A'), '::before')
-}
-
-module.exports = class ActivityBackgrounds extends Plugin {
+module.exports = class SpotifyBackgrounds extends Plugin {
     async startPlugin() {
-        const UserActivity = await getModuleByDisplayName('UserActivity')
+
+        const AnalyticsContext = await getModuleByDisplayName('AnalyticsContext')
         const { getActivities } = await getModule(['getActivities'])
+        const _this = this
 
-        inject('ActivityBackgrounds', UserActivity.prototype, 'render', function (args, res) {
-            if (this.props.__saa) return args
-            const activities = getActivities(this.props.user.id).filter(filterActivities)
-            if (!activities.length) return res
-            if (!this.state) this.state = { activity: activities.indexOf(this.props.activity) }
-            else {
-                // spotify
-                if (activities[0].name === "Spotify") {
-                    let image = "https://i.scdn.co/image/" + activities[0].assets.large_image.split(":")[1]
-                    let item = document.getElementsByClassName('topSectionSpotify-1lI0-P', 'headerSpotify-zpWxgT', 'userPopout-3XzG_A')
-                    if (!item.length) {
-                        item = getPopout()
-                    }
-                    if (!item.length) {
-                        console.log("nothing found :/")
-                        return res
-                    }
-                    item = item[0]
-                    if (item.style) {
-                        item.style.backgroundImage = `url(${image})`
-                        item.zIndex = "1"
-                        item.style.backgroundSize = "auto"
-                    }
+        inject('SpotifyBackgrounds', AnalyticsContext.prototype, 'renderProvider', function (args, res) {
+            // striaght up copy-pasta from user-details by Juby210#0577
+            let arr, popout, text = []
+            if (_this.settings.get('profilePopout', true) && this.props.section == 'Profile Popout') {
+                arr = findInReactTree(res, a => Array.isArray(a) && a.find(c => c && c.type && c.type.displayName == 'CustomStatus'))
+                popout = true
+            } else if (_this.settings.get('profileModal', true) && this.props.section == 'Profile Modal') 
+                arr = findInReactTree(res, a => Array.isArray(a) && a.find(c => c && c.type && c.type.displayName == 'DiscordTag'))
+            if (!arr) return res
+
+            const { user } = findInReactTree(arr, p => p.user)
+
+            // okay here's my work
+            const activities = getActivities(user.id).filter(filterActivities)
+            if (activities[0].name === "Spotify") {
+                // getting shit
+                let spotifyActivity = activities[0]
+                let image = "https://i.scdn.co/image/" + spotifyActivity.assets.large_image.split(":")[1]
+
+                // get the element, don't fail tho
+                let element;
+                if (popout) {
+                    element = document.querySelector(`.userPopout-3XzG_A[aria-label=${user.username}]`).firstChild
+                } else {
+                    element = document.querySelector(".topSectionSpotify-1lI0-P")
                 }
+                if (!element) return res
+                console.log(element);
 
-                // games actually looks like dog shit, remove the slashes to enable, but why would you? just stay with spotify
-                // this doesn't work with all games yet, I'm actually considering making a theme like usrbg so the backgrounds don't look like ass
-//                if (activities[0].type === 0) {
-//                    let image = document.getElementsByClassName('gameIcon-_0rmMm')[0].style.backgroundImage.slice(4).replace(")","");
-//                    let item = document.getElementsByClassName('topSectionPlaying-1J5E4n', 'headerPlaying-j0WQBV', 'userPopout-3XzG_A')[0]
-//
-//                    if (item.style) {
-//                        item.style.backgroundImage = `url(${image})`
-//                        item.zIndex = "1"
-//                        item.style.backgroundSize = "auto"
-//                        item.style.backfaceVisibility = "30%"
-//                    }
-//                    return res
-//
-//                }
-
-
+                if (!element.style) return res
+                let background = element.style
+                background.backgroundImage = `url(${image})`
+                background.backgroundSize = "cover"
+                background.filter = "none"
+                
             }
 
             return res
@@ -68,6 +60,6 @@ module.exports = class ActivityBackgrounds extends Plugin {
     }
 
     pluginWillUnload() {
-        uninject('ActivityBackgrounds')
+        uninject('SpotifyBackgrounds')
     }
 }
