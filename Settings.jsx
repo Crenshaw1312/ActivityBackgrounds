@@ -1,8 +1,15 @@
+
 const { React } = require('powercord/webpack')
-const { SwitchItem } = require('powercord/components/settings')
+const { SwitchItem, SliderInput } = require('powercord/components/settings')
 
 module.exports = class Settings extends React.PureComponent {
+
+	constructor(props) {
+		super(props);
+	}
+
     render() {
+		const { getSetting, toggleSetting, updateSetting } = this.props
         return <>
             <SwitchItem
                 note="Enable to show backgrounds for user-modals only"
@@ -18,6 +25,17 @@ module.exports = class Settings extends React.PureComponent {
                     powercord.pluginManager.remount('SpotifyBackgrounds')
                 }}
             >Change Spotify Player</SwitchItem>
+            <SliderInput
+					minValue={0}
+					maxValue={10}
+					stickToMarkers
+					markers={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+					defaultValue={1}
+					initialValue={getSetting('blur-scale', 1)}
+					onValueChange={val => updateSetting('blur-scale', val)}
+					onMarkerRender={v => `x${v}`}
+				>
+					Blur Scale</SliderInput>
         </>
     }
 }

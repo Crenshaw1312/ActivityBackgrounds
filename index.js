@@ -13,25 +13,31 @@ const filterActivities = (a, i) => {
 }
 
 module.exports = class SpotifyBackgrounds extends Plugin {
+	constructor() {
+		super();
+	}
+
     async startPlugin() {
+        // Blur
+		const { get, set } = this.settings;
+		if (!get('blur-scale')) set('blur-scale', 1);
+		const blurAlbumAmount = get('blur-scale');
+        setTimeout(function(){ document.querySelector(".panels-j1Uci_").style.setProperty('--album-blur-amount', blurAlbumAmount + "px");}, 3000);
         // load settings
         powercord.api.settings.registerSettings('SpotifyBackgrounds', {
             category: this.entityID, label: 'Spotify Backgrounds', render: Settings 
         });
         // load powercord adaption
-
         const AnalyticsContext = await getModuleByDisplayName('AnalyticsContext')
         const { getActivities } = await getModule(['getActivities'])
         const _this = this
-
         if (_this.settings.get("pc-spotify", true)) {
             FluxDispatcher.subscribe("SPOTIFY_CURRENT_TRACK_UPDATED", changeBackground)
-            _this.loadStylesheet('style.css')
+            _this.loadStylesheet('style.scss')
         }
         function changeBackground (song) {
             document.querySelector(".panels-j1Uci_").style.backgroundImage = `url(${song.track.cover})`
         }
-
         inject('SpotifyBackgrounds', AnalyticsContext.prototype, 'renderProvider', function (args, res) {
             // striaght up copy-pasta from user-details by Juby210#0577
             let arr, popout, text = []
@@ -70,11 +76,10 @@ module.exports = class SpotifyBackgrounds extends Plugin {
                 background.filter = "none"
                 
             }
-
+            
             return res
         }, false)
     }
-
     pluginWillUnload() {
         uninject('SpotifyBackgrounds')
         powercord.api.settings.unregisterSettings('SpotifyBackgrounds')
