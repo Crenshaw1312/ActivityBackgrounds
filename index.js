@@ -35,17 +35,18 @@ module.exports = class SpotifyBackgrounds extends Plugin {
             if (activities[0].name === "Spotify") {
                 // getting shit
                 let spotifyActivity = activities[0]
+                if (!spotifyActivity.assets.large_image) return res
                 let image = "https://i.scdn.co/image/" + spotifyActivity.assets.large_image.split(":")[1]
 
                 // get the element, don't fail tho
                 let element;
                 if (popout) {
-                    element = document.querySelector(`.userPopout-3XzG_A[aria-label=${user.username}]`).firstChild
+                    element = document.querySelector(`.userPopout-3XzG_A[aria-label=${user.username}]`)
+                    if (element && element.children.length) element = element.firstChild
                 } else {
                     element = document.querySelector(".topSectionSpotify-1lI0-P")
                 }
                 if (!element) return res
-                console.log(element);
 
                 if (!element.style) return res
                 let background = element.style
