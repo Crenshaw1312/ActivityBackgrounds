@@ -1,7 +1,7 @@
 // credit: Doggybootsy(pinging is okay)#1333
 .powercord-spotify:hover,.container-3baos1:hover {
   backdrop-filter: unset !important;
-  position: center;
+  position: relative;
   &::after{
       backdrop-filter: brightness(70%);
       content: '';
