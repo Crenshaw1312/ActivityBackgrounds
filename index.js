@@ -18,6 +18,7 @@ module.exports = class SpotifyBackgrounds extends Plugin {
 	}
 
     async startPlugin() {
+        this.reloadBlur = this.reloadBlur
         // Blur
 		const { get, set } = this.settings;
 		if (!get('blur-album-scale')) set('blur-album-scale', 1);
@@ -85,4 +86,9 @@ module.exports = class SpotifyBackgrounds extends Plugin {
         powercord.api.settings.unregisterSettings('SpotifyBackgrounds')
         FluxDispatcher.unsubscribe("SPOTIFY_CURRENT_TRACK_UPDATED")
     }
+    reloadBlur() {
+        const blurAlbumAmount = this.settings.get('blur-album-scale');
+        document.querySelector(".panels-j1Uci_").style.setProperty('--album-blur-amount', blurAlbumAmount + "px");
+    }
+    
 }

@@ -1,7 +1,7 @@
 
 const { React } = require('powercord/webpack')
 const { SwitchItem, SliderInput } = require('powercord/components/settings')
-
+const path = require('path')
 module.exports = class Settings extends React.PureComponent {
 
 	constructor(props) {
@@ -26,15 +26,18 @@ module.exports = class Settings extends React.PureComponent {
                 }}
             >Change Spotify Player</SwitchItem>
             <SliderInput
-					minValue={0}
+					minValue={0.5}
 					maxValue={10}
 					stickToMarkers
-					markers={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+					markers={[0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
 					defaultValue={1}
 					initialValue={getSetting('blur-album-scale', 1)}
 					onValueChange={val => updateSetting('blur-album-scale', val)}
 					onMarkerRender={v => `x${v}`}
-					note='At this moment a restart is needed.'
+                    onValueChange={val => {
+                        updateSetting('blur-album-scale', val)
+                        powercord.pluginManager.get(__dirname.split(path.sep).pop()).reloadBlur()
+                    }}
 				>Album Blur Scale</SliderInput>
         </>
     }
