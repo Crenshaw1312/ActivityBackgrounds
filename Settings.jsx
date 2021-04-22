@@ -31,11 +31,11 @@ module.exports = class Settings extends React.PureComponent {
 					stickToMarkers
 					markers={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
 					defaultValue={1}
-					initialValue={getSetting('blur-scale', 1)}
-					onValueChange={val => updateSetting('blur-scale', val)}
+					initialValue={getSetting('blur-album-scale', 1)}
+					onValueChange={val => updateSetting('blur-album-scale', val)}
 					onMarkerRender={v => `x${v}`}
-				>
-					Blur Scale</SliderInput>
+					note='At this moment a restart is needed.'
+				>Album Blur Scale</SliderInput>
         </>
     }
 }

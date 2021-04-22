@@ -20,8 +20,8 @@ module.exports = class SpotifyBackgrounds extends Plugin {
     async startPlugin() {
         // Blur
 		const { get, set } = this.settings;
-		if (!get('blur-scale')) set('blur-scale', 1);
-		const blurAlbumAmount = get('blur-scale');
+		if (!get('blur-album-scale')) set('blur-album-scale', 1);
+		const blurAlbumAmount = get('blur-album-scale');
         setTimeout(function(){ document.querySelector(".panels-j1Uci_").style.setProperty('--album-blur-amount', blurAlbumAmount + "px");}, 3000);
         // load settings
         powercord.api.settings.registerSettings('SpotifyBackgrounds', {
