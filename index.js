@@ -1,7 +1,8 @@
 const { Plugin } = require('powercord/entities')
 const { findInReactTree } = require('powercord/util')
-const { getModule, getModuleByDisplayName } = require('powercord/webpack')
+const { getModule, getModuleByDisplayName, FluxDispatcher } = require('powercord/webpack')
 const { inject, uninject } = require('powercord/injector')
+const Settings = require('./Settings')
 
 let temp
 const filterActivities = (a, i) => {
@@ -13,15 +14,29 @@ const filterActivities = (a, i) => {
 
 module.exports = class SpotifyBackgrounds extends Plugin {
     async startPlugin() {
+        // load settings
+        powercord.api.settings.registerSettings('SpotifyBackgrounds', {
+            category: this.entityID, label: 'Spotify Backgrounds', render: Settings 
+        });
+        // load powercord adaption
 
         const AnalyticsContext = await getModuleByDisplayName('AnalyticsContext')
         const { getActivities } = await getModule(['getActivities'])
         const _this = this
 
+        if (_this.settings.get("pc-spotify", true)) {
+            FluxDispatcher.subscribe("SPOTIFY_CURRENT_TRACK_UPDATED", changeBackground)
+            _this.loadStylesheet('style.css')
+        }
+        function changeBackground (song) {
+            document.querySelector(".panels-j1Uci_").style.backgroundImage = `url(${song.track.cover})`
+        }
+
         inject('SpotifyBackgrounds', AnalyticsContext.prototype, 'renderProvider', function (args, res) {
             // striaght up copy-pasta from user-details by Juby210#0577
             let arr, popout, text = []
             if (_this.settings.get('profilePopout', true) && this.props.section == 'Profile Popout') {
+                if (_this.settings.get("modalsOnly", false)) return res
                 arr = findInReactTree(res, a => Array.isArray(a) && a.find(c => c && c.type && c.type.displayName == 'CustomStatus'))
                 popout = true
             } else if (_this.settings.get('profileModal', true) && this.props.section == 'Profile Modal') 
@@ -62,5 +77,7 @@ module.exports = class SpotifyBackgrounds extends Plugin {
 
     pluginWillUnload() {
         uninject('SpotifyBackgrounds')
+        powercord.api.settings.unregisterSettings('SpotifyBackgrounds')
+        FluxDispatcher.unsubscribe("SPOTIFY_CURRENT_TRACK_UPDATED")
     }
 }
