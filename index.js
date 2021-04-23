@@ -33,15 +33,17 @@ module.exports = class SpotifyBackgrounds extends Plugin {
         const { getActivities } = await getModule(['getActivities'])
         const _this = this
         if (_this.settings.get("pc-spotify", true)) {
-            FluxDispatcher.subscribe("SPOTIFY_CURRENT_TRACK_UPDATED", changeBackground)
+            FluxDispatcher.subscribe("SPOTIFY_CURRENT_TRACK_UPDATED", ((song) => {
+                document.querySelector(".panels-j1Uci_").style.backgroundImage = `url(${song.track.cover})`
+            }))
             _this.loadStylesheet('style.scss')
         }
-        function changeBackground (song) {
-            document.querySelector(".panels-j1Uci_").style.backgroundImage = `url(${song.track.cover})`
-        }
+
+        // Inject the stuff
         inject('SpotifyBackgrounds', AnalyticsContext.prototype, 'renderProvider', function (args, res) {
             // striaght up copy-pasta from user-details by Juby210#0577
-            let arr, popout, text = []
+            let arr = []
+            let popout, image, element
             if (_this.settings.get('profilePopout', true) && this.props.section == 'Profile Popout') {
                 if (_this.settings.get("modalsOnly", false)) return res
                 arr = findInReactTree(res, a => Array.isArray(a) && a.find(c => c && c.type && c.type.displayName == 'CustomStatus'))
@@ -52,17 +54,24 @@ module.exports = class SpotifyBackgrounds extends Plugin {
 
             const { user } = findInReactTree(arr, p => p.user)
 
-            // okay here's my work
+            // get the activites
             const activities = getActivities(user.id).filter(filterActivities)
-            if (activities[0].name === "Spotify") {
-                // getting shit
-                let spotifyActivity = activities[0]
+            if (!activities.length) return res
+            // get the spotify activity
+            let spotifyActivity;
+            if (_this.settings.get("overrideOthers", false)) {
+                spotifyActivity = activities.find(activity => activity.name === "Spotify")
+            } else {
+                activities[0].type === 2 ? activities[0] : false
+            }
+            if (spotifyActivity) {
+
+                // getting image
                 if (!spotifyActivity.assets.large_image) return res
-                let image = "https://i.scdn.co/image/" + spotifyActivity.assets.large_image.split(":")[1]
+                image = "https://i.scdn.co/image/" + spotifyActivity.assets.large_image.split(":")[1]
 
                 // get the element, don't fail tho
                 setTimeout(function() {
-                    let element;
                     if (popout) {
                         element = document.querySelector(`.userPopout-3XzG_A[aria-label=${user.username}]`)
                         if (element && element.children.length) element = element.firstChild
@@ -70,14 +79,17 @@ module.exports = class SpotifyBackgrounds extends Plugin {
                         element = document.querySelector(".topSectionSpotify-1lI0-P")
                     }
                     if (!element) return res
-    
+                    changeImage(element, image)
+                }, .1); // thanks Doggybootsy(pinging is okay)#1333 for the timeout
+
+                // update image
+                function changeImage(element, image) {
                     if (!element.style) return res
                     let background = element.style
                     background.backgroundImage = `url(${image})`
                     background.backgroundSize = "cover"
                     background.filter = "none"
-                }, .01); // thanks Doggybootsy(pinging is okay)#1333 for the timeout
-                
+                }
             }
             
             return res
@@ -88,6 +100,8 @@ module.exports = class SpotifyBackgrounds extends Plugin {
         powercord.api.settings.unregisterSettings('SpotifyBackgrounds')
         FluxDispatcher.unsubscribe("SPOTIFY_CURRENT_TRACK_UPDATED")
     }
+
+    // pc-spotify blur
     reloadBlur() {
         const blurAlbumAmount = this.settings.get('blur-album-scale');
         document.querySelector(".panels-j1Uci_").style.setProperty('--album-blur-amount', blurAlbumAmount + "px");

@@ -25,13 +25,22 @@ module.exports = class Settings extends React.PureComponent {
                     powercord.pluginManager.remount('SpotifyBackgrounds')
                 }}
             >Change Spotify Player</SwitchItem>
+            <SwitchItem
+                note="Change playing/streaming/watching backgrounds even if spotify isn't the top activity"
+                value={this.props.getSetting('overrideOthers', false)}
+                onChange={(val) => {
+                    this.props.toggleSetting('overrideOthers')
+                }}
+            >Override Activites</SwitchItem>
             <SliderInput
 					minValue={0.5}
 					maxValue={10}
+                    note="Change the blur amount on the pc-spotify"
 					stickToMarkers
 					markers={[0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
 					defaultValue={1}
 					initialValue={getSetting('blur-album-scale', 1)}
+                    disabled={!getSetting('pc-spotify')}
 					onValueChange={val => updateSetting('blur-album-scale', val)}
 					onMarkerRender={v => `x${v}`}
                     onValueChange={val => {

@@ -1,6 +1,6 @@
 # Spotify Backgrounds
 Takes the album cover and makes it the background for the user modal and popout
-> The popout doesn't work all the time, workin on fix
+> Heads up: album art background may make the text hard to read depending on what the art looks like
 
 | Option     | Togglable |
 | ---------  | --- |
