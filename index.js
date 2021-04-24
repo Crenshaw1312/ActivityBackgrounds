@@ -124,7 +124,8 @@ module.exports = class ActivityBackgrounds extends Plugin {
                     image =  document.querySelector(".assets-VMAukC") || document.querySelector(".assetsLargeImageUserPopout-3Pp8BK") || document.querySelector(".gameIcon-_0rmMm").style.backgroundImage.slice(4).replace(")", "")
                     if (image.children) image = image.firstChild
                     if (image.src) image = image.src
-                    image = image.replace("size=64", "size=256")
+                    image = image.split("?")[0] + "?size=1024"
+                    console.log(image);
 
                     let element = getElement(popout, user, ".topSectionPlaying-1J5E4n")
                     if (!element) return res
