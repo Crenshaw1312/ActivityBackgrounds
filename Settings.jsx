@@ -1,37 +1,83 @@
 
 const { React } = require('powercord/webpack')
-const { SwitchItem, SliderInput } = require('powercord/components/settings')
+const { SwitchItem, SliderInput, Category, RadioGroup } = require('powercord/components/settings')
 const path = require('path')
 module.exports = class Settings extends React.PureComponent {
 
 	constructor(props) {
 		super(props);
+        this.state = { category0Opened: false, category1Opened: false, category2Opened: false };
 	}
 
     render() {
 		const { getSetting, toggleSetting, updateSetting } = this.props
         return <>
-            <SwitchItem
-                note="Enable to show backgrounds for user-modals only"
-                value={this.props.getSetting('modalsOnly', false)}
-                onChange={() => this.props.toggleSetting('modalsOnly')}
-            >Modals Only</SwitchItem>
+            <Category
+                name='Profile and Modal'
+                opened={this.state.category0Opened}
+                onChange={() => {
+                    this.setState({ category0Opened: !this.state.category0Opened })
+                    this.setState({ category1Opened: false })
+                    this.setState({ category2Opened: false })
+                }}
+            >
+                <SwitchItem
+                    value={getSetting('profilePopout', true)}
+                    onChange={() => toggleSetting('profilePopout')}
+                >Allow Popouts</SwitchItem>
+                <SwitchItem
+                    value={getSetting('profileModal', true)}
+                    onChange={() => toggleSetting('profileModal')}
+                >Allow Modals</SwitchItem>
+            </Category>
+
+            <Category
+                name="Manage Allowed Activities"
+                opened={this.state.category1Opened}
+                onChange={() => {
+                    this.setState({ category1Opened: !this.state.category1Opened })
+                    this.setState({ category0Opened: false })
+                    this.setState({ category2Opened: false })
+                }}
+            >
+                <SwitchItem
+                    value={getSetting('allowSpotify', true)}
+                    onChange={() => toggleSetting('allowSpotify')}
+                >Allow Spotify</SwitchItem>
+                <SwitchItem
+                    value={getSetting('allowGames', false)}
+                    onChange={() => toggleSetting('allowGames')}
+                >Allow Games</SwitchItem>
+            </Category>
+
+            <RadioGroup
+                onChange={e => updateSetting("dominant", e.value)}
+                note="What type should be dominant"
+                value={getSetting("dominant", "co-dominant")}
+                options={[
+                    {
+                        name: "Spotify",
+                        value: "spotify"
+                    }, {
+                        name: "Games",
+                        value: "games"
+                    }, {
+                        name: "Co-dominant",
+                        desc: "Whatever the first activity is",
+                        value: "co-dominant"
+                    }
+                ]}
+            >Dominance</RadioGroup>
+
             <SwitchItem
                 note="Changes the spotify controller's background"
-                value={this.props.getSetting('pc-spotify', true)}
+                value={getSetting('pc-spotify', true)}
                 onChange={(val) => {
-                    this.props.toggleSetting('pc-spotify')
+                    toggleSetting('pc-spotify')
                     if (!val) document.querySelector(".panels-j1Uci_").style.backgroundImage = "none"
-                    powercord.pluginManager.remount('SpotifyBackgrounds')
+                    powercord.pluginManager.remount('ActivityBackgrounds')
                 }}
             >Change Spotify Player</SwitchItem>
-            <SwitchItem
-                note="Change playing/streaming/watching backgrounds even if spotify isn't the top activity"
-                value={this.props.getSetting('overrideOthers', false)}
-                onChange={(val) => {
-                    this.props.toggleSetting('overrideOthers')
-                }}
-            >Override Activites</SwitchItem>
             <SliderInput
 					minValue={0.5}
 					maxValue={10}
@@ -47,7 +93,7 @@ module.exports = class Settings extends React.PureComponent {
                         updateSetting('blur-album-scale', val)
                         powercord.pluginManager.get(__dirname.split(path.sep).pop()).reloadBlur()
                     }}
-				>Album Blur Scale</SliderInput>
+			>Album Blur Scale</SliderInput>
         </>
     }
 }

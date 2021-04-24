@@ -12,22 +12,28 @@ const filterActivities = (a, i) => {
     return a.type !== 4
 }
 
-module.exports = class SpotifyBackgrounds extends Plugin {
+module.exports = class ActivityBackgrounds extends Plugin {
 	constructor() {
 		super();
 	}
 
     async startPlugin() {
         this.reloadBlur = this.reloadBlur
+        
         // Blur
-		const { get, set } = this.settings;
-		if (!get('blur-album-scale')) set('blur-album-scale', 1);
-		const blurAlbumAmount = get('blur-album-scale');
-        setTimeout(function(){ document.querySelector(".panels-j1Uci_").style.setProperty('--album-blur-amount', blurAlbumAmount + "px");}, 3000);
+		if (!this.settings.get('blur-album-scale')) this.settings.set('blur-album-scale', 1);
+		const blurAlbumAmount = this.settings.get('blur-album-scale');
+        setTimeout(function(){
+            document.querySelector(".panels-j1Uci_").style.setProperty('--album-blur-amount', blurAlbumAmount + "px");
+        }, 3000);
+
         // load settings
-        powercord.api.settings.registerSettings('SpotifyBackgrounds', {
-            category: this.entityID, label: 'Spotify Backgrounds', render: Settings 
+        powercord.api.settings.registerSettings('ActivityBackgrounds', {
+            category: this.entityID,
+            label: 'Activity Backgrounds',
+            render: Settings 
         });
+
         // load powercord adaption
         const AnalyticsContext = await getModuleByDisplayName('AnalyticsContext')
         const { getActivities } = await getModule(['getActivities'])
@@ -40,64 +46,99 @@ module.exports = class SpotifyBackgrounds extends Plugin {
         }
 
         // Inject the stuff
-        inject('SpotifyBackgrounds', AnalyticsContext.prototype, 'renderProvider', function (args, res) {
+        inject('ActivityBackgrounds', AnalyticsContext.prototype, 'renderProvider', function (args, res) {
+            // functions
+                    // update image
+            function changeImage(element, image) {
+                if (!element.style) return res
+                let background = element.style
+                background.backgroundImage = `url(${image})`
+                background.backgroundSize = "cover"
+                background.filter = "none"
+            }
+
+            // get popout or modal
+            function getElement(isPopout, user, topSection) {
+                let element
+                if (isPopout) {
+                    element = document.querySelector(`.userPopout-3XzG_A`)
+                    if (element && element.children.length) element = element.firstChild
+                } else {
+                    element = document.querySelector(topSection)
+                }
+                return element
+            }
+
             // striaght up copy-pasta from user-details by Juby210#0577
             let arr = []
-            let popout, image, element
+            let popout, image
             if (_this.settings.get('profilePopout', true) && this.props.section == 'Profile Popout') {
-                if (_this.settings.get("modalsOnly", false)) return res
                 arr = findInReactTree(res, a => Array.isArray(a) && a.find(c => c && c.type && c.type.displayName == 'CustomStatus'))
                 popout = true
-            } else if (_this.settings.get('profileModal', true) && this.props.section == 'Profile Modal') 
+            } else if (_this.settings.get('profileModal', true) && this.props.section == 'Profile Modal') {
                 arr = findInReactTree(res, a => Array.isArray(a) && a.find(c => c && c.type && c.type.displayName == 'DiscordTag'))
-            if (!arr) return res
+            }
+            if (!arr.length) return res
 
             const { user } = findInReactTree(arr, p => p.user)
 
             // get the activites
             const activities = getActivities(user.id).filter(filterActivities)
             if (!activities.length) return res
-            // get the spotify activity
-            let spotifyActivity;
-            if (_this.settings.get("overrideOthers", false)) {
-                spotifyActivity = activities.find(activity => activity.name === "Spotify")
-            } else {
-                activities[0].type === 2 ? activities[0] : false
+
+
+            // get the dominant activity
+            let activity = false
+            let defaultActivity = activities[0]
+            switch (_this.settings.get("dominant", "co-dominant")) {
+                case "spotify":
+                    _this.settings.get("allowSpotify", true) ? activity = activities.find(activity => activity.type === 2) : activity = defaultActivity
+                    break;
+                case "games":
+                    _this.settings.get("allowGames", false) ? activity = activities.find(activity => activity.type === 0) : activity = defaultActivity
+                    break;
+                case "co-dominant":
+                    activity = defaultActivity
+                    break;
             }
-            if (spotifyActivity) {
-
-                // getting image
-                if (!spotifyActivity.assets.large_image) return res
-                image = "https://i.scdn.co/image/" + spotifyActivity.assets.large_image.split(":")[1]
-
+            if (!activity) activity = defaultActivity
+            // spotify
+            if (activity.type === 2) {
                 // get the element, don't fail tho
                 setTimeout(function() {
-                    if (popout) {
-                        element = document.querySelector(`.userPopout-3XzG_A[aria-label=${user.username}]`)
-                        if (element && element.children.length) element = element.firstChild
-                    } else {
-                        element = document.querySelector(".topSectionSpotify-1lI0-P")
-                    }
+                    // get the image
+                    if (!activity.assets.large_image) return res
+                    image = "https://i.scdn.co/image/" + activity.assets.large_image.split(":")[1]
+
+                    let element = getElement(popout, user, ".topSectionSpotify-1lI0-P")
                     if (!element) return res
                     changeImage(element, image)
-                }, .1); // thanks Doggybootsy(pinging is okay)#1333 for the timeout
+                }, .01)
+            }
 
-                // update image
-                function changeImage(element, image) {
-                    if (!element.style) return res
-                    let background = element.style
-                    background.backgroundImage = `url(${image})`
-                    background.backgroundSize = "cover"
-                    background.filter = "none"
-                }
+            // game
+            if (activity.type === 0) {
+                setTimeout(function() {
+                    // get the image
+                    image =  document.querySelector(".assets-VMAukC") || document.querySelector(".assetsLargeImageUserPopout-3Pp8BK") || document.querySelector(".gameIcon-_0rmMm").style.backgroundImage.slice(4).replace(")", "")
+                    if (image.children) image = image.firstChild
+                    if (image.src) image = image.src
+                    image = image.replace("size=64", "size=256")
+
+                    let element = getElement(popout, user, ".topSectionPlaying-1J5E4n")
+                    if (!element) return res
+                    changeImage(element, image)
+                    
+                }, .01)
             }
             
             return res
         }, false)
     }
+
     pluginWillUnload() {
-        uninject('SpotifyBackgrounds')
-        powercord.api.settings.unregisterSettings('SpotifyBackgrounds')
+        uninject('ActivityBackgrounds')
+        powercord.api.settings.unregisterSettings('ActivityBackgrounds')
         FluxDispatcher.unsubscribe("SPOTIFY_CURRENT_TRACK_UPDATED")
     }
 
