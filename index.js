@@ -89,19 +89,20 @@ module.exports = class ActivityBackgrounds extends Plugin {
 
             // get the dominant activity
             let activity = false
-            let defaultActivity = activities[0]
             switch (_this.settings.get("dominant", "co-dominant")) {
                 case "spotify":
-                    _this.settings.get("allowSpotify", true) ? activity = activities.find(activity => activity.type === 2) : activity = defaultActivity
+                    activity = activities.find(activity => activity.type === 2)
                     break;
                 case "games":
-                    _this.settings.get("allowGames", false) ? activity = activities.find(activity => activity.type === 0) : activity = defaultActivity
+                    activity = activities.find(activity => activity.type === 0)
                     break;
                 case "co-dominant":
-                    activity = defaultActivity
+                    activity = activities[0]
                     break;
             }
-            if (!activity) activity = defaultActivity
+            if (!activity) return res
+            if ((!_this.settings.get("allowGames", false) && activity.type === 0) || (!_this.settings.get("allowSpotify", true) && activity.type === 2)) return res
+
             // spotify
             if (activity.type === 2) {
                 // get the element, don't fail tho
