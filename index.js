@@ -20,7 +20,7 @@ module.exports = class ActivityBackgrounds extends Plugin {
     async startPlugin() {
         this.reloadBlur = this.reloadBlur
         
-        // Blur
+        // Blurry Wurry
 		if (!this.settings.get('blur-album-scale')) this.settings.set('blur-album-scale', 1);
 		const blurAlbumAmount = this.settings.get('blur-album-scale');
         setTimeout(function(){
@@ -89,10 +89,6 @@ module.exports = class ActivityBackgrounds extends Plugin {
             // get the activites
             const activities = getActivities(user.id).filter(filterActivities)
             if (!activities.length && !_this.settings.get("allowAvatar", true)) return res
-            let avatarActivity = {
-                type: 6,
-                image: user.avatarURL
-            }
 
             // get the dominant activity
             let activity = false
@@ -108,17 +104,18 @@ module.exports = class ActivityBackgrounds extends Plugin {
                     break;
                 case "avatar":
                     // shhhhhh laziness + big brain
-                    activity = avatarActivity
+                    activity = {type: 6}
                     break;
             }
 
-            if (!activity && _this.settings.get("allowAvatar", true)) activity = avatarActivity
+            if (!activity.type && !activities[0] && _this.settings.get("allowAvatar", true)) activity = {type: 6}
+            if (!activity) activity = activities[0]
 
             console.log(activity);
             if (!activity) return res
             if ((!_this.settings.get("allowGames", false) && activity.type === 0) || (!_this.settings.get("allowSpotify", true) && activity.type === 2) || (!_this.settings.get("allowAvatar", false) && activity.type === 6)) return res
 
-            // spotify
+            // circle with lines that make sounds
             if (activity.type === 2) {
                 // get the element, don't fail tho
                 setTimeout(function() {
@@ -132,7 +129,7 @@ module.exports = class ActivityBackgrounds extends Plugin {
                 }, .01)
             }
 
-            // game
+            // game on!
             if (activity.type === 0) {
                 setTimeout(function() {
                     // get the image
@@ -148,12 +145,12 @@ module.exports = class ActivityBackgrounds extends Plugin {
                 }, .01)
             }
 
-            // avatar
+            // avatar, the last image bender
             if (activity.type === 6) {
                 setTimeout(function() {
                     let element = getElement(popout, user, ".topSectionNormal-2-vo2m")
                     if (!element) return res
-                    changeImage(element, activity.image)
+                    changeImage(element, user.avatarURL)
                 }, .01)
             }
             
