@@ -88,8 +88,11 @@ module.exports = class ActivityBackgrounds extends Plugin {
 
             // get the activites
             const activities = getActivities(user.id).filter(filterActivities)
-            if (!activities.length) return res
-
+            if (!activities.length && !_this.settings.get("allowAvatar", true)) return res
+            let avatarActivity = {
+                type: 6,
+                image: user.avatarURL
+            }
 
             // get the dominant activity
             let activity = false
@@ -103,9 +106,17 @@ module.exports = class ActivityBackgrounds extends Plugin {
                 case "co-dominant":
                     activity = activities[0]
                     break;
+                case "avatar":
+                    // shhhhhh laziness + big brain
+                    activity = avatarActivity
+                    break;
             }
+
+            if (!activity && _this.settings.get("allowAvatar", true)) activity = avatarActivity
+
+            console.log(activity);
             if (!activity) return res
-            if ((!_this.settings.get("allowGames", false) && activity.type === 0) || (!_this.settings.get("allowSpotify", true) && activity.type === 2)) return res
+            if ((!_this.settings.get("allowGames", false) && activity.type === 0) || (!_this.settings.get("allowSpotify", true) && activity.type === 2) || (!_this.settings.get("allowAvatar", false) && activity.type === 6)) return res
 
             // spotify
             if (activity.type === 2) {
@@ -134,6 +145,15 @@ module.exports = class ActivityBackgrounds extends Plugin {
                     if (!element) return res
                     changeImage(element, image)
                     
+                }, .01)
+            }
+
+            // avatar
+            if (activity.type === 6) {
+                setTimeout(function() {
+                    let element = getElement(popout, user, ".topSectionNormal-2-vo2m")
+                    if (!element) return res
+                    changeImage(element, activity.image)
                 }, .01)
             }
             

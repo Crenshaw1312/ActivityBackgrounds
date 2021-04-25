@@ -48,6 +48,11 @@ module.exports = class Settings extends React.PureComponent {
                     value={getSetting('allowGames', false)}
                     onChange={() => toggleSetting('allowGames')}
                 >Allow Games</SwitchItem>
+                <SwitchItem
+                    note="If no activity, use their avatar"
+                    value={getSetting('allowAvatar', false)}
+                    onChange={() => toggleSetting('allowAvatar')}
+                >Allow Avatar</SwitchItem>
             </Category>
 
             <RadioGroup
@@ -56,6 +61,9 @@ module.exports = class Settings extends React.PureComponent {
                 value={getSetting("dominant", "co-dominant")}
                 options={[
                     {
+                        name: "Avatar",
+                        value: "avatar"
+                    }, {
                         name: "Spotify",
                         value: "spotify"
                     }, {
