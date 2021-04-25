@@ -122,6 +122,14 @@ module.exports = class Settings extends React.PureComponent {
                 }}
             >Hover Player</SwitchItem>
             <SwitchItem
+                note="Only show activty and info on hover in the modal - Crenshaw1312"
+                value={getSetting('hoverModal', false)}
+                onChange={() => {
+                    toggleSetting('hoverModal')
+                    powercord.pluginManager.remount('ActivityBackgrounds')
+                }}
+            >Hover Modal</SwitchItem>
+            <SwitchItem
                 note="Remove cover and game art icon - Leeprky#2063"
                 value={getSetting('noCovers', false)}
                 onChange={() => {

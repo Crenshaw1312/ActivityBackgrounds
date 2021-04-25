@@ -1,0 +1,17 @@
+/* the header */
+.modal-3c3bKg .root-SR8cQa .header-QKLPzZ div{
+    transition: .4s opacity linear;
+    opacity: 0;
+}
+.modal-3c3bKg .root-SR8cQa .header-QKLPzZ:hover div{
+    opacity: 1;
+}
+
+/*the activity*/
+.headerFill-adLl4x div{
+    transition: .4s opacity linear;
+    opacity: 0;
+}
+.headerFill-adLl4x:hover div{
+    opacity: 1;
+}
