@@ -111,7 +111,6 @@ module.exports = class ActivityBackgrounds extends Plugin {
             if (!activity.type && !activities[0] && _this.settings.get("allowAvatar", true)) activity = {type: 6}
             if (!activity) activity = activities[0]
 
-            console.log(activity);
             if (!activity) return res
             if ((!_this.settings.get("allowGames", false) && activity.type === 0) || (!_this.settings.get("allowSpotify", true) && activity.type === 2) || (!_this.settings.get("allowAvatar", false) && activity.type === 6)) return res
 
