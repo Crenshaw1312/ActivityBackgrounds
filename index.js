@@ -41,6 +41,10 @@ module.exports = class ActivityBackgrounds extends Plugin {
         // load powercord adaption
         const AnalyticsContext = await getModuleByDisplayName('AnalyticsContext')
         const { getActivities } = await getModule(['getActivities'])
+        const typeToClass = {
+            0: ".topSectionPlaying-1J5E4n ",
+            2: ".topSectionSpotify-1lI0-P"
+        }
         const _this = this
         if (_this.settings.get("pc-spotify", true)) {
             FluxDispatcher.subscribe("SPOTIFY_CURRENT_TRACK_UPDATED", ((song) => {
@@ -54,19 +58,18 @@ module.exports = class ActivityBackgrounds extends Plugin {
             // functions
                     // update image
             function changeImage(element, image) {
-                if (!element.style) return res
-                let background = element.style
-                background.backgroundImage = `url(${image})`
-                background.backgroundSize = "cover"
-                background.filter = "none"
+                if (!element.style) return
+                element.style.backgroundImage = `url(${image})`
+                element.style.backgroundSize = "cover"
+                element.style.filter = "none"
             }
 
             // get popout or modal
-            function getElement(isPopout, user, topSection) {
+            function getElement(isPopout, topSection) {
                 let element
                 if (isPopout) {
                     element = document.querySelector(`.userPopout-3XzG_A`)
-                    if (element && element.children.length) element = element.firstChild
+                    if (element && element.children) element = element.firstChild
                 } else {
                     element = document.querySelector(topSection)
                 }
@@ -88,7 +91,7 @@ module.exports = class ActivityBackgrounds extends Plugin {
 
             // get the activites
             const activities = getActivities(user.id).filter(filterActivities)
-            if (!activities.length && !_this.settings.get("allowAvatar", true)) return res
+            if (!activities[0] && !_this.settings.get("allowAvatar", true)) return res
 
             // get the dominant activity
             let activity = false
@@ -108,7 +111,7 @@ module.exports = class ActivityBackgrounds extends Plugin {
                     break;
             }
 
-            if (!activity.type && !activities[0] && _this.settings.get("allowAvatar", true)) activity = {type: 6}
+            if (!activity && !activities[0] && _this.settings.get("allowAvatar", true)) activity = {type: 6}
             if (!activity) activity = activities[0]
 
             if (!activity) return res
@@ -122,7 +125,7 @@ module.exports = class ActivityBackgrounds extends Plugin {
                     if (!activity.assets.large_image) return res
                     image = "https://i.scdn.co/image/" + activity.assets.large_image.split(":")[1]
 
-                    let element = getElement(popout, user, ".topSectionSpotify-1lI0-P")
+                    let element = getElement(popout, ".topSectionSpotify-1lI0-P")
                     if (!element) return res
                     changeImage(element, image)
                 }, .01)
@@ -137,7 +140,7 @@ module.exports = class ActivityBackgrounds extends Plugin {
                     if (image.src) image = image.src
                     image = image.split("?")[0] + "?size=1024"
 
-                    let element = getElement(popout, user, ".topSectionPlaying-1J5E4n")
+                    let element = getElement(popout, ".topSectionPlaying-1J5E4n")
                     if (!element) return res
                     changeImage(element, image)
                     
@@ -147,10 +150,11 @@ module.exports = class ActivityBackgrounds extends Plugin {
             // avatar, the last image bender
             if (activity.type === 6) {
                 setTimeout(function() {
-                    let element = getElement(popout, user, ".topSectionNormal-2-vo2m")
-                    if (!element) return res
-                    changeImage(element, user.avatarURL)
-                }, .01)
+                    let element = getElement(popout, activities[0] ? typeToClass[activities[0].type] : ".topSectionNormal-2-vo2m")
+                    image = user.avatarURL.replace("size=128", "size=2048")
+                    if (!element) return
+                    changeImage(element, image)
+                }, .1)
             }
             
             return res
