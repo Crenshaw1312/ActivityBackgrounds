@@ -47,6 +47,8 @@ module.exports = class ActivityBackgrounds extends Plugin {
             2: ".topSectionSpotify-1lI0-P"
         }
         const _this = this
+
+        // pc-spotify
         if (_this.settings.get("pc-spotify", true)) {
             FluxDispatcher.subscribe("SPOTIFY_CURRENT_TRACK_UPDATED", ((song) => {
                 document.querySelector(".panels-j1Uci_").style.backgroundImage = `url(${song.track.cover})`
@@ -126,8 +128,8 @@ module.exports = class ActivityBackgrounds extends Plugin {
                     if (!activity.assets.large_image) return res
                     image = "https://i.scdn.co/image/" + activity.assets.large_image.split(":")[1]
 
-                    let element = getElement(popout, ".topSectionSpotify-1lI0-P")
-                    if (!element) return res
+                    let element = getElement(popout, activities[0].type !== 2 ? typeToClass[activities[0].type] : typeToClass[2])
+                    if (!element) return
                     changeImage(element, image)
                 }, .01)
             }
@@ -141,8 +143,8 @@ module.exports = class ActivityBackgrounds extends Plugin {
                     if (image.src) image = image.src
                     image = image.split("?")[0] + "?size=1024"
 
-                    let element = getElement(popout, ".topSectionPlaying-1J5E4n")
-                    if (!element) return res
+                    let element = getElement(popout, activities[0].type !== 0 ? typeToClass[activities[0].type] : typeToClass[0])
+                    if (!element) return
                     changeImage(element, image)
                     
                 }, .01)
