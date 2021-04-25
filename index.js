@@ -103,7 +103,7 @@ module.exports = class ActivityBackgrounds extends Plugin {
                     activity = activities.find(activity => activity.type === 0)
                     break;
                 case "co-dominant":
-                    activity = _this.settings.get("allowAvatar", true) ? {type: 6} : activities[0]
+                    activity = _this.settings.get("allowAvatar", true) && !activities[0] ? {type: 6} : activities[0]
                     break;
                 case "avatar":
                     // shhhhhh laziness + big brain
