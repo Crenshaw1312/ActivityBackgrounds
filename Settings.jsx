@@ -93,7 +93,35 @@ module.exports = class Settings extends React.PureComponent {
                         updateSetting('blur-album-scale', val)
                         powercord.pluginManager.get(__dirname.split(path.sep).pop()).reloadBlur()
                     }}
-			>Album Blur Scale</SliderInput>
+			>Album Blur Scale</SliderInput>\
+
+            <Category
+                name="Manage Snippets"
+                note="Snippets by the powercord community"
+                opened={this.state.category2Opened}
+                onChange={() => {
+                    this.setState({ category2Opened: !this.state.category2Opened })
+                    this.setState({ category1Opened: false })
+                    this.setState({ category0Opened: false })
+                }}
+            >
+            <SwitchItem
+                note="Only show options on player when hover - Doggybootsy(pinging is okay)#1333"
+                value={getSetting('hoverPlayer', false)}
+                onChange={() => {
+                    toggleSetting('hoverPlayer')
+                    powercord.pluginManager.remount('ActivityBackgrounds')
+                }}
+            >Hover Player</SwitchItem>
+            <SwitchItem
+                note="Remove cover and game art icon - Leeprky#2063"
+                value={getSetting('noCovers', false)}
+                onChange={() => {
+                    toggleSetting('noCovers')
+                    powercord.pluginManager.remount('ActivityBackgrounds')
+                }}
+            >No Covers</SwitchItem>
+            </Category>
         </>
     }
 }

@@ -34,6 +34,10 @@ module.exports = class ActivityBackgrounds extends Plugin {
             render: Settings 
         });
 
+        // load snippets
+        if (this.settings.get("hoverPlayer", false)) this.loadStylesheet("./snippets/hoverPlayer.css")
+        if (this.settings.get("noCovers", false)) this.loadStylesheet("./snippets/noCovers.css")
+
         // load powercord adaption
         const AnalyticsContext = await getModuleByDisplayName('AnalyticsContext')
         const { getActivities } = await getModule(['getActivities'])

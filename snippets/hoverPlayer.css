@@ -1,0 +1,10 @@
+[style*="background-image"].panels-j1Uci_{
+    min-height:140px;
+  }
+  [style*="background-image"].panels-j1Uci_ div{
+    transition: .4s opacity linear;
+    opacity: 0;
+  }
+  [style*="background-image"].panels-j1Uci_:hover div{
+      opacity: 1;
+  }
