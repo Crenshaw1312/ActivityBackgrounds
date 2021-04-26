@@ -8,3 +8,8 @@
   [style*="background-image"].panels-j1Uci_:hover div{
       opacity: 1;
   }
+
+/**/
+.userPopout-3XzG_A .headerSpotify-zpWxgT, .userPopout-3XzG_A .headerPlaying-j0WQBV  {
+  backdrop-filter: blur(0px);
+}

@@ -1,0 +1,22 @@
+/* Leeprky#2063 */
+/* Expanded Hover Blur */
+.inner-1ilYF7:hover .header-QKLPzZ,
+.inner-1ilYF7:hover .headerFill-adLl4x {
+   backdrop-filter: blur(var(--blur-hover-modal));
+   background-color: rgba(7, 7, 7, 0.397);
+}
+/* Popout Hover Blur */
+.userPopout-3XzG_A:hover .headerTop-3C2Zn0,
+.userPopout-3XzG_A:hover .activity-11LB_k {
+   backdrop-filter: blur(var(--blur-hover-popout));
+   background-color: rgba(7, 7, 7, 0.397);
+}
+/* PC-Spotify */
+[style*="background-image:"] .powercord-spotify:hover, [style*="background-image:"] > .container-3baos1:hover, [style*="background-image:"] .wrapper-24pKcD:hover {
+   backdrop-filter: blur(var(--blur-hover-pcspotify));
+   background-color: rgba(7, 7, 7, 0.397);
+}
+.panels-j1Uci_:hover .powercord-spotify, 
+.panels-j1Uci_:hover .container-3baos1 {
+   backdrop-filter: blur(var(--blur-hover-pcspotify));
+}

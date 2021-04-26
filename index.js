@@ -37,7 +37,8 @@ module.exports = class ActivityBackgrounds extends Plugin {
         // load snippets
         if (this.settings.get("hoverPlayer", false)) this.loadStylesheet("./snippets/hoverPlayer.css")
         if (this.settings.get("hoverModal", false)) this.loadStylesheet("./snippets/hoverModal.css")
-        if (this.settings.get("noCovers", false)) this.loadStylesheet("./snippets/noCovers.css")
+        if (this.settings.get("noCovers", false)) this.loadStylesheet("./snippets/noCovers.css") // may bnot let plugin corre
+        if (this.settings.get("hoverBlurControl", false)) this.loadStylesheet("./snippets/hoverBlurControl.css")
 
         // load powercord adaption
         const AnalyticsContext = await getModuleByDisplayName('AnalyticsContext')
@@ -59,7 +60,7 @@ module.exports = class ActivityBackgrounds extends Plugin {
         // Inject the stuff
         inject('ActivityBackgrounds', AnalyticsContext.prototype, 'renderProvider', function (args, res) {
             // functions
-                    // update image
+            // update image
             function changeImage(element, image) {
                 if (!element.style) return
                 element.style.backgroundImage = `url(${image})`
@@ -68,7 +69,7 @@ module.exports = class ActivityBackgrounds extends Plugin {
             }
 
             // get popout or modal
-            function getElement(isPopout, topSection) {
+            function getElement(_this, isPopout, topSection) {
                 let element
                 if (isPopout) {
                     element = document.querySelector(`.userPopout-3XzG_A`)
@@ -76,6 +77,15 @@ module.exports = class ActivityBackgrounds extends Plugin {
                 } else {
                     element = document.querySelector(topSection)
                 }
+
+                // deal with hoverBlurControl
+                // popout
+                let blurAmount = _this.settings.get('blur-hover-popout', 1);
+                if (blurAmount && isPopout) element.style.setProperty('--blur-hover-popout', blurAmount + "px");
+                // modal
+                blurAmount = _this.settings.get('blur-hover-modal', 1);
+                if (blurAmount && !isPopout) element.style.setProperty('--blur-hover-modal', blurAmount + "px");
+
                 return element
             }
 
@@ -109,7 +119,7 @@ module.exports = class ActivityBackgrounds extends Plugin {
                     activity = _this.settings.get("allowAvatar", true) && !activities[0] ? {type: 6} : activities[0]
                     break;
                 case "avatar":
-                    // shhhhhh laziness + big brain
+                    // shhhhhh laziness + big brain, just make a faxe activity
                     activity = {type: 6}
                     break;
             }
@@ -128,7 +138,7 @@ module.exports = class ActivityBackgrounds extends Plugin {
                     if (!activity.assets.large_image) return res
                     image = "https://i.scdn.co/image/" + activity.assets.large_image.split(":")[1]
 
-                    let element = getElement(popout, activities[0].type !== 2 ? typeToClass[activities[0].type] : typeToClass[2])
+                    let element = getElement(_this, popout, activities[0].type !== 2 ? typeToClass[activities[0].type] : typeToClass[2])
                     if (!element) return
                     changeImage(element, image)
                 }, .01)
@@ -143,7 +153,7 @@ module.exports = class ActivityBackgrounds extends Plugin {
                     if (image.src) image = image.src
                     image = image.split("?")[0] + "?size=1024"
 
-                    let element = getElement(popout, activities[0].type !== 0 ? typeToClass[activities[0].type] : typeToClass[0])
+                    let element = getElement(_this, popout, activities[0].type !== 0 ? typeToClass[activities[0].type] : typeToClass[0])
                     if (!element) return
                     changeImage(element, image)
                     
@@ -153,13 +163,12 @@ module.exports = class ActivityBackgrounds extends Plugin {
             // avatar, the last image bender
             if (activity.type === 6) {
                 setTimeout(function() {
-                    let element = getElement(popout, activities[0] ? typeToClass[activities[0].type] : ".topSectionNormal-2-vo2m")
+                    let element = getElement(_this, popout, activities[0] ? typeToClass[activities[0].type] : ".topSectionNormal-2-vo2m")
                     image = user.avatarURL.replace("size=128", "size=2048")
                     if (!element) return
                     changeImage(element, image)
                 }, .1)
             }
-            
             return res
         }, false)
     }
@@ -172,8 +181,12 @@ module.exports = class ActivityBackgrounds extends Plugin {
 
     // pc-spotify blur
     reloadBlur() {
-        const blurAlbumAmount = this.settings.get('blur-album-scale');
-        document.querySelector(".panels-j1Uci_").style.setProperty('--album-blur-amount', blurAlbumAmount + "px");
+        // pcspotiy
+        let blurAmount = this.settings.get('blur-hover-pcspotify', 0.5) * 2;
+        if (blurAmount) {
+            document.querySelector(".panels-j1Uci_").style.setProperty('--blur-hover-pcspotify', blurAmount + "px");
+        }
+        
     }
     
 }

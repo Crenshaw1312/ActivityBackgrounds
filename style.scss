@@ -9,14 +9,14 @@
     bottom: 0;
     right: 0;
     z-index: -1;
-    backdrop-filter: blur(var(--album-blur-amount));
+    backdrop-filter: blur(var(--blur-hover-pcspotify));
   }
 }
 [style*="background-image:"]{
 .powercord-spotify:hover,
 &>.container-3baos1:hover,
 .wrapper-24pKcD:hover {
-  position: relative;
+  position: center;
   z-index: 3;
   &::after{
       backdrop-filter: brightness(70%);

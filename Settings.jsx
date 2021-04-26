@@ -6,19 +6,20 @@ module.exports = class Settings extends React.PureComponent {
 
 	constructor(props) {
 		super(props);
-        this.state = { category0Opened: false, category1Opened: false, category2Opened: false };
+        this.state = { category0Opened: false, category1Opened: false, category2Opened: false, category3Opened: false};
 	}
 
     render() {
 		const { getSetting, toggleSetting, updateSetting } = this.props
         return <>
             <Category
-                name='Profile and Modal'
+                name='Change Background Locations'
                 opened={this.state.category0Opened}
                 onChange={() => {
                     this.setState({ category0Opened: !this.state.category0Opened })
                     this.setState({ category1Opened: false })
                     this.setState({ category2Opened: false })
+                    this.setState({ category3Opened: false })
                 }}
             >
                 <SwitchItem
@@ -29,6 +30,14 @@ module.exports = class Settings extends React.PureComponent {
                     value={getSetting('profileModal', true)}
                     onChange={() => toggleSetting('profileModal')}
                 >Allow Modals</SwitchItem>
+                <SwitchItem
+                    value={getSetting('pc-spotify', true)}
+                    onChange={(val) => {
+                        toggleSetting('pc-spotify')
+                        if (!val) document.querySelector(".panels-j1Uci_").style.backgroundImage = "none"
+                        powercord.pluginManager.remount('ActivityBackgrounds')
+                    }}
+            >Spotify Player</SwitchItem>
             </Category>
 
             <Category
@@ -38,6 +47,7 @@ module.exports = class Settings extends React.PureComponent {
                     this.setState({ category1Opened: !this.state.category1Opened })
                     this.setState({ category0Opened: false })
                     this.setState({ category2Opened: false })
+                    this.setState({ category3Opened: false })
                 }}
             >
                 <SwitchItem
@@ -53,6 +63,126 @@ module.exports = class Settings extends React.PureComponent {
                     value={getSetting('allowAvatar', false)}
                     onChange={() => toggleSetting('allowAvatar')}
                 >Allow Avatar</SwitchItem>
+            </Category>
+
+            <Category
+                name="Manage Snippets"
+                note="Snippets by the powercord community"
+                opened={this.state.category2Opened}
+                onChange={() => {
+                    this.setState({ category2Opened: !this.state.category2Opened })
+                    this.setState({ category1Opened: false })
+                    this.setState({ category0Opened: false })
+                    this.setState({ category3Opened: false })
+                }}
+            >
+            <SwitchItem
+                note="Provides sliders to change how much the backgroud is blurred on hover"
+                value={getSetting('hoverBlurControl', false)}
+                onChange={() => {
+                    toggleSetting('hoverBlurControl')
+                    powercord.pluginManager.remount('ActivityBackgrounds')
+                }}
+            >Hover Blur Control</SwitchItem>
+            
+            {getSetting('hoverBlurControl', false) && (
+            <Category
+                name="Blur Controls"
+                opened={this.state.category3Opened}
+                onChange={() => {
+                    this.setState({ category3Opened: !this.state.category3Opened })
+                    this.setState({ category0Opened: false })
+                    this.setState({ category1Opened: false })
+            }}
+            >
+                <SliderInput
+					minValue={0.5}
+					maxValue={10}
+					stickToMarkers
+					markers={[0.5, 1, 1.5, 3, 5, 10]}
+					defaultValue={1}
+					initialValue={getSetting('blur-hover-pcspotify', 1)}
+                    disabled={!getSetting('pc-spotify', true)}
+					onValueChange={val => updateSetting('blur-hover-pcspotify', val)}
+					onMarkerRender={v => `x${v}`}
+                    onValueChange={val => {
+                        updateSetting('blur-hover-pcspotify', val)
+                        powercord.pluginManager.get(__dirname.split(path.sep).pop()).reloadBlur()
+                    }}
+			    >pc-Spotify Blur</SliderInput>
+                <SliderInput
+					minValue={0.5}
+					maxValue={10}
+					stickToMarkers
+					markers={[0.5, 1, 1.5, 3, 5, 10]}
+					defaultValue={1}
+					initialValue={getSetting('blur-hover-popout', 1)}
+                    disabled={!getSetting('profilePopout', true)}
+					onValueChange={val => updateSetting('blur-hover-popout', val)}
+					onMarkerRender={v => `x${v}`}
+                    onValueChange={val => {
+                        updateSetting('blur-hover-popout', val)
+                        powercord.pluginManager.get(__dirname.split(path.sep).pop()).reloadBlur()
+                    }}
+			    >Popout Blur</SliderInput>
+                <SliderInput
+					minValue={0.5}
+					maxValue={10}
+					stickToMarkers
+					markers={[0.5, 1, 1.5, 3, 5, 10]}
+					defaultValue={1}
+					initialValue={getSetting('blur-hover-modal', 1)}
+                    disabled={!getSetting('profileModal', true)}
+					onValueChange={val => updateSetting('blur-hover-modal', val)}
+					onMarkerRender={v => `x${v}`}
+                    onValueChange={val => {
+                        updateSetting('blur-hover-modal', val)
+                        powercord.pluginManager.get(__dirname.split(path.sep).pop()).reloadBlur()
+                    }}
+			    >Modal Blur</SliderInput>
+            </Category>)}
+
+            <SwitchItem
+                note={
+                    <>
+                    <p>Only show options on player when hover - Doggybootsy(pinging is okay)#1333</p>
+                    <img width="200px" src="https://crenshaw.otters.store/uploads/b1215eff-59ca-4766-99c4-8d7ffb87d6a7/jFiSkYzU.gif"></img>
+                    </>
+                }
+                value={getSetting('hoverPlayer', false)}
+                onChange={() => {
+                    toggleSetting('hoverPlayer')
+                    powercord.pluginManager.remount('ActivityBackgrounds')
+                }}
+            >Hover Player</SwitchItem>
+
+            <SwitchItem
+                note={
+                    <>
+                    <p>Only show activty and info on hover in the modal - Crenshaw1312"</p>
+                    <img width="200px" src="https://crenshaw.otters.store/uploads/b1215eff-59ca-4766-99c4-8d7ffb87d6a7/JOZIOHGO.gif"></img>
+                    </>
+                }
+                value={getSetting('hoverModal', false)}
+                onChange={() => {
+                    toggleSetting('hoverModal')
+                    powercord.pluginManager.remount('ActivityBackgrounds')
+                }}
+            >Hover Modal</SwitchItem>
+
+            <SwitchItem
+                note={
+                    <>
+                    <p>Remove cover and game art icon - Leeprky#2063</p>
+                    <img width="200px" src="https://crenshaw.otters.store/uploads/b1215eff-59ca-4766-99c4-8d7ffb87d6a7/dq4EeNwN.png"></img>
+                    </>
+                }
+                value={getSetting('noCovers', false)}
+                onChange={() => {
+                    toggleSetting('noCovers')
+                    powercord.pluginManager.remount('ActivityBackgrounds')
+                }}
+            >No Covers</SwitchItem>
             </Category>
 
             <RadioGroup
@@ -76,68 +206,6 @@ module.exports = class Settings extends React.PureComponent {
                     }
                 ]}
             >Dominance</RadioGroup>
-
-            <SwitchItem
-                note="Changes the spotify controller's background"
-                value={getSetting('pc-spotify', true)}
-                onChange={(val) => {
-                    toggleSetting('pc-spotify')
-                    if (!val) document.querySelector(".panels-j1Uci_").style.backgroundImage = "none"
-                    powercord.pluginManager.remount('ActivityBackgrounds')
-                }}
-            >Change Spotify Player</SwitchItem>
-            <SliderInput
-					minValue={0.5}
-					maxValue={10}
-                    note="Change the blur amount on the pc-spotify"
-					stickToMarkers
-					markers={[0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
-					defaultValue={1}
-					initialValue={getSetting('blur-album-scale', 1)}
-                    disabled={!getSetting('pc-spotify')}
-					onValueChange={val => updateSetting('blur-album-scale', val)}
-					onMarkerRender={v => `x${v}`}
-                    onValueChange={val => {
-                        updateSetting('blur-album-scale', val)
-                        powercord.pluginManager.get(__dirname.split(path.sep).pop()).reloadBlur()
-                    }}
-			>Album Blur Scale</SliderInput>\
-
-            <Category
-                name="Manage Snippets"
-                note="Snippets by the powercord community"
-                opened={this.state.category2Opened}
-                onChange={() => {
-                    this.setState({ category2Opened: !this.state.category2Opened })
-                    this.setState({ category1Opened: false })
-                    this.setState({ category0Opened: false })
-                }}
-            >
-            <SwitchItem
-                note="Only show options on player when hover - Doggybootsy(pinging is okay)#1333"
-                value={getSetting('hoverPlayer', false)}
-                onChange={() => {
-                    toggleSetting('hoverPlayer')
-                    powercord.pluginManager.remount('ActivityBackgrounds')
-                }}
-            >Hover Player</SwitchItem>
-            <SwitchItem
-                note="Only show activty and info on hover in the modal - Crenshaw1312"
-                value={getSetting('hoverModal', false)}
-                onChange={() => {
-                    toggleSetting('hoverModal')
-                    powercord.pluginManager.remount('ActivityBackgrounds')
-                }}
-            >Hover Modal</SwitchItem>
-            <SwitchItem
-                note="Remove cover and game art icon - Leeprky#2063"
-                value={getSetting('noCovers', false)}
-                onChange={() => {
-                    toggleSetting('noCovers')
-                    powercord.pluginManager.remount('ActivityBackgrounds')
-                }}
-            >No Covers</SwitchItem>
-            </Category>
         </>
     }
 }
