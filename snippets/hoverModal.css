@@ -8,6 +8,20 @@
 }
 
 /*the activity*/
+.tabBarContainer-1s1u-z div{
+    transition: .4s opacity linear;
+    opacity: 0;
+}
+.tabBarContainer-1s1u-z:hover div{
+    opacity: 1;
+}
+.activity-1ythUs div{
+    transition: .4s opacity linear;
+    opacity: 0;
+}
+.activity-1ythUs:hover div {
+    opacity: 1;
+}
 .headerFill-adLl4x div{
     transition: .4s opacity linear;
     opacity: 0;
