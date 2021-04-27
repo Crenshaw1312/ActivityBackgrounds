@@ -59,6 +59,10 @@ module.exports = class Settings extends React.PureComponent {
                     onChange={() => toggleSetting('allowGames')}
                 >Allow Games</SwitchItem>
                 <SwitchItem
+                    value={getSetting('allowStream', false)}
+                    onChange={() => toggleSetting('allowStream')}
+                >Allow Streaming</SwitchItem>
+                <SwitchItem
                     note="If no activity, use their avatar"
                     value={getSetting('allowAvatar', false)}
                     onChange={() => toggleSetting('allowAvatar')}
@@ -206,11 +210,14 @@ module.exports = class Settings extends React.PureComponent {
                     }, {
                         name: "Games",
                         value: "games"
+                    },{
+                        name: "Streaming",
+                        value: "streams"
                     }, {
                         name: "Co-dominant",
                         desc: "Whatever the first activity is",
                         value: "co-dominant"
-                    }
+                    },
                 ]}
             >Dominance</RadioGroup>
         </>

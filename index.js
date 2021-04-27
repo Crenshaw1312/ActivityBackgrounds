@@ -45,6 +45,7 @@ module.exports = class ActivityBackgrounds extends Plugin {
         const { getActivities } = await getModule(['getActivities'])
         const typeToClass = {
             0: ".topSectionPlaying-1J5E4n ",
+            1: ".headerStreaming-2FjmGz",
             2: ".topSectionSpotify-1lI0-P",
         }
         const _this = this
@@ -118,6 +119,9 @@ module.exports = class ActivityBackgrounds extends Plugin {
                 case "co-dominant":
                     activity = _this.settings.get("allowAvatar", true) && !activities[0] ? {type: 6} : activities[0]
                     break;
+                case "streams":
+                    activity = activities.find(activity => activity.type === 1)
+                    break;
                 case "avatar":
                     // shhhhhh laziness + big brain, just make a faxe activity
                     activity = {type: 6}
@@ -131,7 +135,7 @@ module.exports = class ActivityBackgrounds extends Plugin {
             // if a bot, do pfp
             if (_this.settings.get("allowAvatar", false) && user.bot && _this.settings.get("botAvatar", true)) activity = {type:6}
             // make sure it's an allowed activity
-            if ((!_this.settings.get("allowGames", false) && activity.type === 0) || (!_this.settings.get("allowSpotify", true) && activity.type === 2) || (!_this.settings.get("allowAvatar", false) && activity.type === 6)) return res
+            if ((!_this.settings.get("allowGames", false) && activity.type === 0) || (!_this.settings.get("allowSpotify", true) && activity.type === 2) || (!_this.settings.get("allowStream", true) && activity.type === 1) || (!_this.settings.get("allowAvatar", false) && activity.type === 6)) return res
 
             // changing the backgrounds
             // circle with lines that make sounds
@@ -143,6 +147,20 @@ module.exports = class ActivityBackgrounds extends Plugin {
                     image = "https://i.scdn.co/image/" + activity.assets.large_image.split(":")[1]
 
                     let element = getElement(_this, popout, activities[0].type !== 2 ? typeToClass[activities[0].type] : typeToClass[2])
+                    if (!element) return
+                    changeImage(element, image)
+                }, .01)
+            }
+
+            // streamless
+            if (activity.type === 1) {
+                setTimeout(function() {
+                    image =  document.querySelector(".assets-VMAukC") || document.querySelector(".assetsLargeImageUserPopout-3Pp8BK") || document.querySelector(".gameIcon-_0rmMm").style.backgroundImage.slice(4).replace(")", "")
+                    if (image.children) image = image.firstChild
+                    if (image.src) image = image.src
+                    image = image.replace("108x60.jpg", "1024x1024.jpg")
+
+                    let element = getElement(_this, popout, activities[0].type !== 6 ? typeToClass[activities[0].type] : typeToClass[6])
                     if (!element) return
                     changeImage(element, image)
                 }, .01)
