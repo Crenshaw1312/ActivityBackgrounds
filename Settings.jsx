@@ -117,7 +117,8 @@ module.exports = class Settings extends React.PureComponent {
 					markers={[0.5, 1, 1.5, 3, 5, 10]}
 					defaultValue={1}
 					initialValue={getSetting('blur-hover-popout', 1)}
-                    disabled={!getSetting('profilePopout', true)}
+                    disabled={true}
+                    note="Under work since it breaks"
 					onValueChange={val => updateSetting('blur-hover-popout', val)}
 					onMarkerRender={v => `x${v}`}
                     onValueChange={val => {
