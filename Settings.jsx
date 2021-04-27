@@ -37,7 +37,7 @@ module.exports = class Settings extends React.PureComponent {
                         if (!val) document.querySelector(".panels-j1Uci_").style.backgroundImage = "none"
                         powercord.pluginManager.remount('ActivityBackgrounds')
                     }}
-            >Spotify Player</SwitchItem>
+                >Spotify Player</SwitchItem>
             </Category>
 
             <Category
@@ -184,6 +184,12 @@ module.exports = class Settings extends React.PureComponent {
                 }}
             >No Covers</SwitchItem>
             </Category>
+
+            <SwitchItem
+                note="No matter the bot's activity, use their avatar"
+                value={getSetting('botAvatar', true)}
+                onChange={() => toggleSetting('botAvatar')}
+            >Bots use Avatar</SwitchItem>
 
             <RadioGroup
                 onChange={e => updateSetting("dominant", e.value)}

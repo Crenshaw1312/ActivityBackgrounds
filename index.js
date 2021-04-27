@@ -38,14 +38,14 @@ module.exports = class ActivityBackgrounds extends Plugin {
         if (this.settings.get("hoverPlayer", false)) this.loadStylesheet("./snippets/hoverPlayer.css")
         if (this.settings.get("hoverModal", false)) this.loadStylesheet("./snippets/hoverModal.css")
         if (this.settings.get("noCovers", false)) this.loadStylesheet("./snippets/noCovers.css") // may bnot let plugin corre
-        if (this.settings.get("hoverBlurControl", false)) this.loadStylesheet("./snippets/hoverBlurControl.css")
+        if (this.settings.get("blurControl", false)) this.loadStylesheet("./snippets/blurControl.css")
 
         // load powercord adaption
         const AnalyticsContext = await getModuleByDisplayName('AnalyticsContext')
         const { getActivities } = await getModule(['getActivities'])
         const typeToClass = {
             0: ".topSectionPlaying-1J5E4n ",
-            2: ".topSectionSpotify-1lI0-P"
+            2: ".topSectionSpotify-1lI0-P",
         }
         const _this = this
 
@@ -124,12 +124,16 @@ module.exports = class ActivityBackgrounds extends Plugin {
                     break;
             }
 
+            // filters and settings
             if (!activity && !activities[0] && _this.settings.get("allowAvatar", true)) activity = {type: 6}
             if (!activity) activity = activities[0]
-
             if (!activity) return res
+            // if a bot, do pfp
+            if (_this.settings.get("allowAvatar", false) && user.bot && _this.settings.get("botAvatar", true)) activity = {type:6}
+            // make sure it's an allowed activity
             if ((!_this.settings.get("allowGames", false) && activity.type === 0) || (!_this.settings.get("allowSpotify", true) && activity.type === 2) || (!_this.settings.get("allowAvatar", false) && activity.type === 6)) return res
 
+            // changing the backgrounds
             // circle with lines that make sounds
             if (activity.type === 2) {
                 // get the element, don't fail tho
@@ -163,7 +167,7 @@ module.exports = class ActivityBackgrounds extends Plugin {
             // avatar, the last image bender
             if (activity.type === 6) {
                 setTimeout(function() {
-                    let element = getElement(_this, popout, activities[0] ? typeToClass[activities[0].type] : ".topSectionNormal-2-vo2m")
+                    let element = getElement(_this, popout, activities[0] && !user.bot ? typeToClass[activities[0].type] :  user.bot ? ".topSectionPlaying-1J5E4n " : ".topSectionNormal-2-vo2m")
                     image = user.avatarURL.replace("size=128", "size=2048")
                     if (!element) return
                     changeImage(element, image)
