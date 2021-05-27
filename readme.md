@@ -1,4 +1,5 @@
 # Activity Backgrounds
+## fucking broke from banners update reeeeeeeeeeeeeeeeeeeeeeeeeeee
 Takes the art cover, or game, and makes it the background, you can disable games and dominance order of backgrounds.
 > Heads up: background may make the text hard to read depending on what the art looks like
 
